@@ -25,6 +25,8 @@
     #include <getopt.h>
 #endif
 
+#include "core/Cardenal.h"
+
 #define VERSION_STR "0.0.1"
 
 static void usage(const char* argv);
@@ -42,7 +44,7 @@ int main(int argc, char* argv[])
     int hflag = 0, vflag = 0;
     int dflag = 0, eflag = 0;
 
-    static std::string password = "";
+    static std::string key = "";
 
     while (true)
     {
@@ -64,11 +66,11 @@ int main(int argc, char* argv[])
             case 0:
                 break;
             case 'e':
-                password = optarg;
+                key = optarg;
                 eflag = 1;
                 break;
             case 'd':
-                password = optarg;
+                key = optarg;
                 dflag = 1;
                 break;
             case 'v':
@@ -91,8 +93,11 @@ int main(int argc, char* argv[])
         return 0;
 
     // Ésta comprobación sobra pero yo no me ando con mamadas :v
-    if ((password.length() == 0) || (password == ""))
+    if ((key.length() == 0) || (key == ""))
+    {
+        std::cerr << argv[0] << ": the password is empty" << std::endl;
         std::exit(1);
+    }
     
     std::vector<std::string> files = {};
     for (int i = 1; i < argc; i++)
@@ -102,18 +107,21 @@ int main(int argc, char* argv[])
         files.push_back(argv[i]);
     }
 
+    Cipher crypter(key);
     if (eflag)
     {
-        // TODO: Agregar el cifrado
+        for (auto file : files)
+            crypter.Crypt(file);
     }
     else if (dflag)
     {
-        // TODO: Agregar el descifrado
+        for (auto file : files)
+            crypter.Decrypt(file);
     }
     else
     {
         // No sé cómo fue posible llegar aquí :v
-        std::cerr << "Sácate los hacks :v" << std::endl;
+        std::cerr << "Get off hacks :v" << std::endl;
         std::exit(1);
     }
 

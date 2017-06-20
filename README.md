@@ -1,4 +1,4 @@
-# Cardenal Lite Desktop
+# Cardenal Lite™ Desktop
 
 ## What is this ?
 

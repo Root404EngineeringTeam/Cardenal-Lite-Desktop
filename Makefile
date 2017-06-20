@@ -20,7 +20,7 @@ OBJ_NAME = cardenal
 BIN_DIR  = bin
 
 all:
-	# mkdir $(BIN_DIR)
+	mkdir -p $(BIN_DIR)
 	$(CC) $(FLAGS) $(OBJS) -o $(BIN_DIR)/$(OBJ_NAME)
 
 clean:

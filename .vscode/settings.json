@@ -24,6 +24,10 @@
         "type_traits": "cpp",
         "typeinfo": "cpp",
         "utility": "cpp",
-        "fstream": "cpp"
+        "fstream": "cpp",
+        "cstddef": "cpp",
+        "cstring": "cpp",
+        "functional": "cpp",
+        "memory": "cpp"
     }
 }

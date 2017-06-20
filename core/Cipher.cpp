@@ -19,11 +19,14 @@
 
 #include <iostream>
 #include <algorithm>
+#include <sys/stat.h>
+#include <sys/types.h>
 
 #include <cryptopp/hex.h>
 #include <cryptopp/sha.h>
 
 void WriteToFile(std::ofstream& out_file, std::string fileName, std::vector<unsigned char>& content);
+std::ifstream::pos_type GetFileSize(std::string fileName);
 
 Cipher::Cipher(const std::string& key)
 {
@@ -42,43 +45,54 @@ Cipher::Cipher(const std::string& key)
     key_index = 0;
 }
 
-void Cipher::XOREncode(std::string fileName, std::vector<unsigned char>& data)
+/*
+ * Abrir un archivo sólo para leerle los bloques y luego
+ * cerrarlo para volver abrirlo y ahí sí leer su contenido
+ * es una completa mamada. Mejor todo de golpe.
+ */
+void Cipher::Process(std::string fileName)
 {
     in_file.open(fileName, std::fstream::in);
 
     if (in_file.is_open())
     {
-        key_index = 0;
-        while (in_file >> std::noskipws >> a)
-        {
-            k = password[key_index];
-            r = a ^ k;
-            data.push_back(r);
+        long int blocks = 0; /* ¿Tal vez sólo int? */
+        long int file_size = GetFileSize(fileName);
+        std::cout << "file_size: " << file_size << std::endl;
 
-            if (key_index >= key_length)
-                key_index = 0;
-            else
-                key_index++;
+        while (true)
+        {
+            long int start = BLOCK_SIZE * blocks,
+                     end   = start + BLOCK_SIZE;
+        
+            if (end > file_size)
+                end = file_size;
+
+            parts.push_back(part{start, end, blocks});
+            blocks++;
+            
+            if ((blocks * BLOCK_SIZE) > file_size)
+                break;
         }
     }
     else
-        std::cerr << "unable to open " << fileName << std::endl;
+        std::cerr << "[*] Unable to open " << fileName << std::endl;
 
     in_file.close();
 }
 
 void Cipher::Crypt(std::string fileName)
 {
-    std::vector<unsigned char> out;
-    XOREncode(fileName, out);
-    WriteToFile(out_file, fileName + ".crypted", out);
+    // std::vector<unsigned char> out;
+    Process(fileName);
+    // WriteToFile(out_file, fileName + ".crypted", out);
 }
 
 void Cipher::Decrypt(std::string fileName)
 {
-    std::vector<unsigned char> out;
-    XOREncode(fileName, out);
-    WriteToFile(out_file, fileName.erase(fileName.find(".crypted")), out);
+    // std::vector<unsigned char> out;
+    Process(fileName);
+    // WriteToFile(out_file, fileName.erase(fileName.find(".crypted")), out);
 }
 
 void WriteToFile(std::ofstream& out_file, std::string fileName, std::vector<unsigned char>& content)
@@ -92,9 +106,15 @@ void WriteToFile(std::ofstream& out_file, std::string fileName, std::vector<unsi
         }
     }
     else
-        std::cerr << "unable to create " << fileName << " and write content on it" << std::endl;
+        std::cerr << "[*] Unable to create " << fileName << " and write content on it" << std::endl;
     
     out_file.close();
+}
+
+std::ifstream::pos_type GetFileSize(std::string fileName)
+{
+    std::ifstream in(fileName, std::ifstream::ate | std::ifstream::binary);
+    return in.tellg();
 }
 
 Cipher::~Cipher()

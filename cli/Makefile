@@ -14,7 +14,7 @@
 # limitations under the License.
 
 CC       = g++
-OBJS     = Main.cpp core/Cipher.cpp
+OBJS     = Main.cpp ../core/Cipher.cpp
 FLAGS    = --std=c++14 -Wall -lcryptopp
 OBJ_NAME = cardenal
 BIN_DIR  = bin

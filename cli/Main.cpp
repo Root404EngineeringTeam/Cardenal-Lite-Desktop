@@ -25,7 +25,7 @@
     #include <getopt.h>
 #endif
 
-#include "core/Cardenal.h"
+#include "../core/Cardenal.h"
 
 #define VERSION_STR "0.0.1"
 
@@ -35,8 +35,8 @@ int main(int argc, char* argv[])
 {
     if (argc < 2)
     {
-        std::cerr << argv[0] << ": falta un operando" << std::endl
-                  << "Pruebe '" << argv[0] << " --help' para más información." << std::endl;
+        std::cerr << argv[0] << ": missing operand" << std::endl
+                  << "Try '" << argv[0] << " --help' for more information." << std::endl;
         std::exit(1);
     }
 
@@ -95,7 +95,7 @@ int main(int argc, char* argv[])
     // Ésta comprobación sobra pero yo no me ando con mamadas :v
     if ((key.length() == 0) || (key == ""))
     {
-        std::cerr << argv[0] << ": the password is empty" << std::endl;
+        std::cerr << argv[0] << ": the password is empty. Exiting..." << std::endl;
         std::exit(1);
     }
     
@@ -120,8 +120,7 @@ int main(int argc, char* argv[])
     }
     else
     {
-        // No sé cómo fue posible llegar aquí :v
-        std::cerr << "Get off hacks :v" << std::endl;
+        std::cerr << argv[0] << ": I don't know what the fuck are you doing. Exiting..." << std::endl;
         std::exit(1);
     }
 
@@ -130,15 +129,15 @@ int main(int argc, char* argv[])
 
 static void usage(const char* argv)
 {
-    std::printf("Modo de empleo: %s [OPCIÓN]... FICHERO...\n"
-                "Cifra o descifra los FICHERO(s).\n\n"
+    std::printf("How to use: %s [OPTION]... FILE...\n"
+                "Encrypt or decrypt the FILE(s).\n\n"
                 
-                "Los argumentos obligatorios para las opciones largas son también obligatorios\n"
-                "para las opciones cortas.\n"
-                "  --encrypt=PASSWORD  cifra lo(s) FICHERO(s)\n"
-                "  --decrypt=PASSWORD  descifra lo(s) FICHERO(s)\n"
-                "  --help              muestra esta ayuda y finaliza\n"
-                "  --version           informa de la versión y finaliza\n\n"
+                "Mandatory arguments for long options are also mandatory\n"
+                "for short options.\n"
+                "  --encrypt=PASSWORD  encrypt the FILE(s)\n"
+                "  --decrypt=PASSWORD  decrypt the FILE(s)\n"
+                "  --help              show this help and exit\n"
+                "  --version           show version and exit\n\n"
                 
                 "Ayude sobre errores y/o aportes en:\n"
                 "<https://github.com/Root404EngineeringTeam/Cardenal-Lite-Desktop>\n", argv);

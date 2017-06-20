@@ -21,6 +21,8 @@
 #include <string>
 #include <vector>
 
+#define BLOCK_SIZE 10485760
+
 class Cipher
 {
 public:
@@ -30,7 +32,7 @@ public:
     void Crypt(std::string fileName);
     void Decrypt(std::string fileName);
 private:
-    void XOREncode(std::string fileName, std::vector<unsigned char>& data);
+    void Process(std::string fileName);
 
     unsigned char r, a, k;
 
@@ -40,4 +42,12 @@ private:
     std::ifstream in_file;
     std::ofstream out_file;
     std::string password;
+
+    typedef struct file_part {
+        long int offset;
+        long int len;
+        long int index;
+    } part;
+
+    std::vector<part> parts;
 };

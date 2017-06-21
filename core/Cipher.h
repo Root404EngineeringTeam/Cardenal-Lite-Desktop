@@ -29,9 +29,9 @@ public:
     Cipher(const std::string& key);
     virtual ~Cipher();
 
-    inline void Encode(std::string fileName) { Process(fileName) };
+    inline int Encode(std::string fileName) { return Process(fileName); }
 private:
-    void Process(std::string fileName);
+    int Process(std::string fileName);
 
     unsigned char r, a, k;
 
@@ -41,11 +41,5 @@ private:
     std::string password;
     std::string new_file_name;
 
-    typedef struct file_part {
-        long     int offset;
-        long     int len;
-        unsigned int index;
-    } part;
-
-    std::vector<part> parts;
+    std::vector<long int> ends;
 };

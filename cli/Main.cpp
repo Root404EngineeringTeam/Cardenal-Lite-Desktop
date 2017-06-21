@@ -103,11 +103,12 @@ int main(int argc, char* argv[])
         files.push_back(argv[i]);
     }
 
+    short int ret = 0;
     Cipher crypter(key);
     for (auto file : files)
-        crypter.Encode(file);
+        ret = crypter.Encode(file);
 
-    return 0;
+    return ret;
 }
 
 static void usage(const char* argv)

@@ -29,7 +29,7 @@ public:
     Cipher(const std::string& key);
     virtual ~Cipher();
 
-    void Encode(std::string fileName);
+    inline void Encode(std::string fileName) { Process(fileName) };
 private:
     void Process(std::string fileName);
 
@@ -37,9 +37,6 @@ private:
 
     size_t key_length;
     size_t key_index;
-
-    std::ifstream in_file;
-    std::ofstream out_file;
 
     std::string password;
     std::string new_file_name;

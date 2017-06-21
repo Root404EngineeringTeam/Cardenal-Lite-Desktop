@@ -28,6 +28,13 @@
         "cstddef": "cpp",
         "cstring": "cpp",
         "functional": "cpp",
-        "memory": "cpp"
+        "memory": "cpp",
+        "atomic": "cpp",
+        "algorithm": "cpp",
+        "iterator": "cpp",
+        "memory_resource": "cpp",
+        "random": "cpp",
+        "unordered_map": "cpp",
+        "vector": "cpp"
     }
 }

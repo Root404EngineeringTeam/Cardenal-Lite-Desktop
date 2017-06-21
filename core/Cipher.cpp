@@ -47,89 +47,69 @@ Cipher::Cipher(const std::string& key)
 
 void Cipher::Process(std::string fileName)
 {
-    in_file.open(fileName, std::fstream::in);
-    auto iter = fileName.find(".crypted");
-    if (iter != std::string::npos)
-        new_file_name = fileName.erase(iter, fileName.length());
+    auto fileName_iter = fileName.find(".crypted");
+    if (fileName_iter != std::string::npos)
+        new_file_name = fileName.erase(fileName_iter, fileName.length());
     else
         new_file_name = fileName + ".crypted";
 
-    if (in_file.is_open())
+    unsigned int blocks = 0;
+    long int file_size = GetFileSize(fileName); /* ZFS */
+
+    /* definimos los bloques */
+    while (true)
     {
-        unsigned int blocks = 0;
-        long int file_size = GetFileSize(fileName); /* ZFS */
-
-        while (true)
-        {
-            long int start = BLOCK_SIZE * blocks,
-                     end   = start + BLOCK_SIZE;
+        long int start = BLOCK_SIZE * blocks,
+                 end   = start + BLOCK_SIZE;
         
-            if (end > file_size)
-                end = file_size;
+        if (end > file_size)
+            end = file_size;
 
-            parts.push_back(part{start, end, blocks});
-            blocks++;
+        parts.push_back(part{start, end, blocks});
+        blocks++;
             
-            if ((blocks * BLOCK_SIZE) > file_size)
-                break;
-        }
+        if ((blocks * BLOCK_SIZE) > file_size)
+            break;
+    }
 
-        std::vector<unsigned char> data = {};
-        for (unsigned int i = 0; i < blocks; i++)
+    std::ifstream file(fileName, std::fstream::in);
+    if (file.is_open())
+    {
+        std::string line;
+        for (unsigned int block = 0; block < blocks; block++)
         {
-            long int block_char_index = 0;
-
-            while (in_file >> std::noskipws >> a)
+            while (std::getline(file, line))
             {
-                std::cout << "password[" << key_index << "] = " << password[key_index] << std::endl;
-                k = password[key_index];
-                r = a ^ k;
-                data.push_back(r);
-                block_char_index++;
-
-                if (block_char_index >= parts[i].len)
+                for (unsigned int i = 0; i < line.length(); i++)
                 {
-                    out_file.open(new_file_name, std::fstream::out | std::fstream::app);
-                    if (out_file.is_open())
-                    {
-                        for (auto c: data)
-                            out_file << c;
-                    }
+                    a = line[i];
+                    k = password[key_index];
+
+                    r = a ^ k;
+
+                    if (key_index >= key_length)
+                        key_index = 0;
                     else
-                        std::cerr << "[*] Unable to create " << new_file_name << " file." << std::endl;
-
-                    out_file.close();
-                    data.clear();
+                        key_index++;
                 }
-
-                if (key_index >= key_length)
-                    key_index = 0;
-                else
-                    key_index++;
             }
         }
+
+        file.close();
     }
     else
-        std::cerr << "[*] Unable to open " << fileName << std::endl;
-
-    in_file.close();
-}
-
-void Cipher::Encode(std::string fileName)
-{
-    Process(fileName);
+        std::cerr << "[*] Unable to open \"" << fileName << "\" file. Omiting." << std::endl;
 }
 
 std::ifstream::pos_type GetFileSize(std::string fileName)
 {
     std::ifstream in(fileName, std::ifstream::ate | std::ifstream::binary);
-    return in.tellg();
+    std::ifstream::pos_type size = in.tellg;
+    in.close();
+
+    return size;
 }
 
 Cipher::~Cipher()
 {
-    if (in_file.is_open())
-        in_file.close();
-    if (out_file.is_open())
-        out_file.close();
 }

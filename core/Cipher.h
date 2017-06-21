@@ -29,8 +29,7 @@ public:
     Cipher(const std::string& key);
     virtual ~Cipher();
 
-    void Crypt(std::string fileName);
-    void Decrypt(std::string fileName);
+    void Encode(std::string fileName);
 private:
     void Process(std::string fileName);
 
@@ -41,12 +40,14 @@ private:
 
     std::ifstream in_file;
     std::ofstream out_file;
+
     std::string password;
+    std::string new_file_name;
 
     typedef struct file_part {
-        long int offset;
-        long int len;
-        long int index;
+        long     int offset;
+        long     int len;
+        unsigned int index;
     } part;
 
     std::vector<part> parts;

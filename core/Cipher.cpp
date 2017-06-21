@@ -45,20 +45,19 @@ Cipher::Cipher(const std::string& key)
     key_index = 0;
 }
 
-/*
- * Abrir un archivo sólo para leerle los bloques y luego
- * cerrarlo para volver abrirlo y ahí sí leer su contenido
- * es una completa mamada. Mejor todo de golpe.
- */
 void Cipher::Process(std::string fileName)
 {
     in_file.open(fileName, std::fstream::in);
+    auto iter = fileName.find(".crypted");
+    if (iter != std::string::npos)
+        new_file_name = fileName.erase(iter, fileName.length());
+    else
+        new_file_name = fileName + ".crypted";
 
     if (in_file.is_open())
     {
-        long int blocks = 0; /* ¿Tal vez sólo int? */
-        long int file_size = GetFileSize(fileName);
-        std::cout << "file_size: " << file_size << std::endl;
+        unsigned int blocks = 0;
+        long int file_size = GetFileSize(fileName); /* ZFS */
 
         while (true)
         {
@@ -74,6 +73,41 @@ void Cipher::Process(std::string fileName)
             if ((blocks * BLOCK_SIZE) > file_size)
                 break;
         }
+
+        std::vector<unsigned char> data = {};
+        for (unsigned int i = 0; i < blocks; i++)
+        {
+            long int block_char_index = 0;
+
+            while (in_file >> std::noskipws >> a)
+            {
+                std::cout << "password[" << key_index << "] = " << password[key_index] << std::endl;
+                k = password[key_index];
+                r = a ^ k;
+                data.push_back(r);
+                block_char_index++;
+
+                if (block_char_index >= parts[i].len)
+                {
+                    out_file.open(new_file_name, std::fstream::out | std::fstream::app);
+                    if (out_file.is_open())
+                    {
+                        for (auto c: data)
+                            out_file << c;
+                    }
+                    else
+                        std::cerr << "[*] Unable to create " << new_file_name << " file." << std::endl;
+
+                    out_file.close();
+                    data.clear();
+                }
+
+                if (key_index >= key_length)
+                    key_index = 0;
+                else
+                    key_index++;
+            }
+        }
     }
     else
         std::cerr << "[*] Unable to open " << fileName << std::endl;
@@ -81,34 +115,9 @@ void Cipher::Process(std::string fileName)
     in_file.close();
 }
 
-void Cipher::Crypt(std::string fileName)
+void Cipher::Encode(std::string fileName)
 {
-    // std::vector<unsigned char> out;
     Process(fileName);
-    // WriteToFile(out_file, fileName + ".crypted", out);
-}
-
-void Cipher::Decrypt(std::string fileName)
-{
-    // std::vector<unsigned char> out;
-    Process(fileName);
-    // WriteToFile(out_file, fileName.erase(fileName.find(".crypted")), out);
-}
-
-void WriteToFile(std::ofstream& out_file, std::string fileName, std::vector<unsigned char>& content)
-{
-    out_file.open(fileName, std::fstream::out);
-    if (out_file.is_open())
-    {
-        for (auto b : content)
-        {
-            out_file << b;
-        }
-    }
-    else
-        std::cerr << "[*] Unable to create " << fileName << " and write content on it" << std::endl;
-    
-    out_file.close();
 }
 
 std::ifstream::pos_type GetFileSize(std::string fileName)

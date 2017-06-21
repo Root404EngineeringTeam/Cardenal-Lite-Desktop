@@ -25,13 +25,21 @@ Then you download the project using [git](https://git-scm.com/):
 
     $ git clone https://github.com/Root404EngineeringTeam/Cardenal-Lite-Desktop
 
-Then you go to the downloaded project directory and type:
+Then you can go to _cli/_ directory if you want a terminal application and type:
 
     $ make
 
 This should create a **bin** directory with a executable file named **_cardenal_**. You can run it with:
 
     $ ./cardenal --help
+
+Otherwise, if you wan't a GUI application you can go to _gui/_ directory and type:
+
+    $ make
+
+Then you can execute the binary with double click or trought terminal with:
+
+    $ ./cardenal-gui
 
 ## Contribute
 

@@ -21,11 +21,14 @@
 #include <cstdio>
 #include <cstdlib>
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || defined(__clang__)
     #include <getopt.h>
+    #if !defined _GETOPT_H
+        #include <unistd.h>
+    #endif
 #endif
 
-#include "../core/Cardenal.h"
+#include "../core/Cipher.h"
 
 #define VERSION_STR "0.0.1"
 
@@ -42,22 +45,20 @@ int main(int argc, char* argv[])
 
     int c;
     int hflag = 0, vflag = 0;
-    int dflag = 0, eflag = 0;
 
     static std::string key = "";
 
     while (true)
     {
         static struct option long_opts[] = {
-            {"encrypt", required_argument, 0, 'e'},
-            {"decrypt", required_argument, 0, 'd'},
-            {"help"   , no_argument      , 0, 'h'},
-            {"version", no_argument      , 0, 'v'},
+            {"password", required_argument, 0, 'p'},
+            {"help"    , no_argument      , 0, 'h'},
+            {"version" , no_argument      , 0, 'v'},
             {0, 0, 0, 0}
         };
 
         int opt_index = 0;
-        c = getopt_long(argc, argv, "e::d::hv", long_opts, &opt_index);
+        c = getopt_long(argc, argv, "p::hv", long_opts, &opt_index);
         if (c == -1)
             break;
 
@@ -65,13 +66,8 @@ int main(int argc, char* argv[])
         {
             case 0:
                 break;
-            case 'e':
+            case 'p':
                 key = optarg;
-                eflag = 1;
-                break;
-            case 'd':
-                key = optarg;
-                dflag = 1;
                 break;
             case 'v':
                 std::cout << argv[0] << " v" << VERSION_STR << std::endl;
@@ -108,21 +104,8 @@ int main(int argc, char* argv[])
     }
 
     Cipher crypter(key);
-    if (eflag)
-    {
-        for (auto file : files)
-            crypter.Crypt(file);
-    }
-    else if (dflag)
-    {
-        for (auto file : files)
-            crypter.Decrypt(file);
-    }
-    else
-    {
-        std::cerr << argv[0] << ": I don't know what the fuck are you doing. Exiting..." << std::endl;
-        std::exit(1);
-    }
+    for (auto file : files)
+        crypter.Encode(file);
 
     return 0;
 }
@@ -131,11 +114,13 @@ static void usage(const char* argv)
 {
     std::printf("How to use: %s [OPTION]... FILE...\n"
                 "Encrypt or decrypt the FILE(s).\n\n"
+
+                "If file extension is \".crypted\" then the FILE(s) will be\n"
+                "decrypted. Otherwise, the files will be crypted.\n\n"
                 
                 "Mandatory arguments for long options are also mandatory\n"
                 "for short options.\n"
-                "  --encrypt=PASSWORD  encrypt the FILE(s)\n"
-                "  --decrypt=PASSWORD  decrypt the FILE(s)\n"
+                "  --password=PASSWORD set the encryption or decryption password\n"
                 "  --help              show this help and exit\n"
                 "  --version           show version and exit\n\n"
                 

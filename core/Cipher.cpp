@@ -92,7 +92,7 @@ int Cipher::Process(std::string fileName)
 
         for (unsigned int i = 0; i < blocks; i++)
         {
-            std::cout << "\r" << fileName << ": encoding Block #" << i << " of " << blocks << std::flush;
+            std::cout << "\r" << fileName << ": encoding Block #" << i << " of " << blocks - 1 << std::flush;
 
             while (file >> std::noskipws >> a)
             {
@@ -104,8 +104,6 @@ int Cipher::Process(std::string fileName)
 
                 if ((data_counter + block_chunks[i].start) >= block_chunks[i].end)
                 {
-                    std::cout << "data_counter + block_chunks[" << i << "].start = "
-                              << (data_counter + block_chunks[i].start) << std::endl;
                     key_index = 0;
                     for (auto _bytes : file_data)
                         encoded_file << _bytes;
@@ -122,7 +120,7 @@ int Cipher::Process(std::string fileName)
             }
         }
 
-        std::cout << std::endl;
+        std::cout << ". Done." << std::endl;
 
         encoded_file.close();
         file.close();

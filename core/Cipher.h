@@ -42,7 +42,7 @@ private:
     std::string new_file_name;
 
     typedef struct part {
-        long int end;
+        size_t end;
     } block_chunk;
 
     std::vector<block_chunk> block_chunks;

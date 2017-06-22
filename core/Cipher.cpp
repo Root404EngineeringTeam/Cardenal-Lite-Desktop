@@ -19,8 +19,6 @@
 
 #include <iostream>
 #include <algorithm>
-#include <sys/stat.h>
-#include <sys/types.h>
 
 #include <cryptopp/hex.h>
 #include <cryptopp/sha.h>

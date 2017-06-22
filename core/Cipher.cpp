@@ -63,15 +63,16 @@ int Cipher::Process(std::string fileName)
     /* definimos los bloques */
     while (true)
     {
-        size_t end = (BLOCK_SIZE * blocks) + BLOCK_SIZE;
+        long int start = (BLOCK_SIZE * blocks);
+        long int end   = start + BLOCK_SIZE;
         
         if (end > file_size)
             end = file_size;
 
-        block_chunks.push_back(block_chunk{end});
+        block_chunks.push_back(block_chunk{start, end});
         blocks++;
         
-        if ((blocks * BLOCK_SIZE) > file_size)
+        if (start > file_size)
             break;
     }
 
@@ -87,7 +88,7 @@ int Cipher::Process(std::string fileName)
             return -1;
         }
 
-        size_t data_counter = 0;
+        long int data_counter = 0;
 
         for (unsigned int i = 0; i < blocks; i++)
         {
@@ -101,13 +102,15 @@ int Cipher::Process(std::string fileName)
                 file_data.push_back(r);
                 data_counter++;
 
-                if (data_counter >= block_chunks[i].end)
+                if ((data_counter + block_chunks[i].start) >= block_chunks[i].end)
                 {
-                    std::cout << "data_counter: " << data_counter << std::endl;
+                    std::cout << "data_counter + block_chunks[" << i << "].start = "
+                              << (data_counter + block_chunks[i].start) << std::endl;
                     key_index = 0;
                     for (auto _bytes : file_data)
                         encoded_file << _bytes;
 
+                    data_counter = 0;
                     file_data.clear();
                     break;
                 }

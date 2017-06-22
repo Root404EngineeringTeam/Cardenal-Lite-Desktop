@@ -41,8 +41,8 @@ private:
     std::string password;
     std::string new_file_name;
 
-    typedef struct part {
-        size_t end;
+    typedef struct block {
+        long int start, end;
     } block_chunk;
 
     std::vector<block_chunk> block_chunks;

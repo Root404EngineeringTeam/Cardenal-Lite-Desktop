@@ -81,7 +81,6 @@ int Cipher::Process(std::string fileName)
     if (file.is_open())
     {
         std::vector<unsigned char> file_data;
-        long int data_counter = 0;
 
         std::ofstream encoded_file(new_file_name, std::fstream::out | std::fstream::app);
         if (!encoded_file.is_open())
@@ -90,6 +89,7 @@ int Cipher::Process(std::string fileName)
             return -1;
         }
 
+        long int data_counter = 0;
         for (unsigned int i = 0; i < blocks; i++)
         {
             std::cout << "\r" << fileName << ": encoding Block #" << i << " of " << blocks - 1 << std::flush;
@@ -101,12 +101,13 @@ int Cipher::Process(std::string fileName)
                 file_data.push_back(r);
                 data_counter++;
 
-                if (data_counter >= block_chunks[i].end)
+                if ((data_counter >= block_chunks[i].end) || (data_counter >= BLOCK_SIZE))
                 {
                     key_index = 0;
                     for (auto _bytes : file_data)
                         encoded_file << _bytes;
 
+                    data_counter = 0;
                     file_data.clear();
                     break;
                 }
@@ -143,4 +144,6 @@ std::ifstream::pos_type GetFileSize(std::string fileName)
 
 Cipher::~Cipher()
 {
+    if (block_chunks.size() != 0)
+        block_chunks.clear();
 }

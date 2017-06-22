@@ -47,12 +47,12 @@ Cipher::Cipher(const std::string& key)
 
 int Cipher::Process(std::string fileName)
 {
-    auto fileName_iter = fileName.find(".crypted");
-    if (fileName_iter != std::string::npos)
-        new_file_name = fileName.erase(fileName_iter, fileName.length());
+    new_file_name = fileName;
+    size_t file_name_iter = new_file_name.find(".crypted");
+    if (file_name_iter == std::string::npos)
+        new_file_name += ".crypted";
     else
-        new_file_name = fileName + ".crypted";
-        
+        new_file_name.replace(file_name_iter, 8, "");
 
     unsigned int blocks = 0;
     long int file_size = GetFileSize(fileName); /* ZFS */
@@ -70,14 +70,14 @@ int Cipher::Process(std::string fileName)
         if (end > file_size)
             end = file_size;
 
-        ends.push_back(end);
+        block_chunks.push_back(block_chunk{end});
         blocks++;
-            
+        
         if ((blocks * BLOCK_SIZE) > file_size)
             break;
     }
 
-    std::ifstream file(fileName.c_str(), std::fstream::in);
+    std::ifstream file(fileName, std::fstream::in);
     if (file.is_open())
     {
         std::vector<unsigned char> file_data;
@@ -92,6 +92,7 @@ int Cipher::Process(std::string fileName)
 
         for (unsigned int i = 0; i < blocks; i++)
         {
+            std::cout << "\r" << fileName << ": encoding Block #" << i << " of " << blocks - 1 << std::flush;
             while (file >> std::noskipws >> a)
             {
                 k = password[key_index];
@@ -100,13 +101,14 @@ int Cipher::Process(std::string fileName)
                 file_data.push_back(r);
                 data_counter++;
 
-                if (data_counter >= ends[i])
+                if (data_counter >= block_chunks[i].end)
                 {
                     key_index = 0;
                     for (auto _bytes : file_data)
                         encoded_file << _bytes;
 
                     file_data.clear();
+                    break;
                 }
 
                 if (key_index >= key_length)
@@ -115,6 +117,8 @@ int Cipher::Process(std::string fileName)
                     key_index++;
             }
         }
+
+        std::cout << std::endl;
 
         encoded_file.close();
         file.close();

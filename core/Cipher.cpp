@@ -62,7 +62,7 @@ int Cipher::Process(std::string fileName)
     {
         /* I don't know if this is the best way to get the size
          * of an opened file. But certainly it's better than
-         * open the same file at time
+         * open the same file twice at time.
          */
         std::ifstream::pos_type file_size = file.tellg();
         file.seekg(0, std::ios::end);

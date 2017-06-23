@@ -23,9 +23,6 @@
 #include <cryptopp/hex.h>
 #include <cryptopp/sha.h>
 
-void WriteToFile(std::ofstream& out_file, std::string fileName, std::vector<unsigned char>& content);
-std::ifstream::pos_type GetFileSize(std::string fileName);
-
 Cipher::Cipher(const std::string& key)
 {
     CryptoPP::SHA256 hash;

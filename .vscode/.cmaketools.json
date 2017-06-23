@@ -1,0 +1,28 @@
+{
+  "variant": {
+    "label": "Release",
+    "keywordSettings": {
+      "buildType": "release"
+    },
+    "description": "Enable optimizations, omit debug info"
+  },
+  "activeEnvironments": [],
+  "codeModel": {
+    "configurations": [
+      {
+        "name": "Release",
+        "projects": [
+          {
+            "buildDirectory": "/home/astagg/Documentos/Cardenal/Cardenal-Lite-Desktop/build",
+            "name": "Cardenal-Lite-Desktop",
+            "sourceDirectory": "/home/astagg/Documentos/Cardenal/Cardenal-Lite-Desktop",
+            "targets": []
+          }
+        ]
+      }
+    ],
+    "cookie": "0.6259169863336587",
+    "inReplyTo": "codemodel",
+    "type": "reply"
+  }
+}

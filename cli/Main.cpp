@@ -28,7 +28,7 @@
     #endif
 #endif
 
-#include "../core/Cipher.h"
+#include "../src/Cipher.h"
 
 #define VERSION_STR "0.0.1"
 

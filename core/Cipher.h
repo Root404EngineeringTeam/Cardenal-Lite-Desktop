@@ -39,7 +39,6 @@ private:
     size_t key_index;
 
     std::string password;
-    std::string new_file_name;
 
     typedef struct block {
         long int start, end;

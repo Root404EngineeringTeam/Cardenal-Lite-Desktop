@@ -88,7 +88,7 @@ int main(int argc, char* argv[])
     if (vflag || hflag)
         return 0;
 
-    // Ésta comprobación sobra pero yo no me ando con mamadas :v
+    // This may be unnecessary. But man, I'm paranoid
     if ((key.length() == 0) || (key == ""))
     {
         std::cerr << argv[0] << ": the password is empty. Exiting..." << std::endl;
@@ -105,7 +105,7 @@ int main(int argc, char* argv[])
 
     short int ret = 0;
     Cipher crypter(key);
-    for (auto file : files)
+    for (auto& file : files)
         ret = crypter.Encode(file);
 
     return ret;

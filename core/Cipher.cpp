@@ -45,102 +45,104 @@ Cipher::Cipher(const std::string& key)
 
 int Cipher::Process(std::string fileName)
 {
-    new_file_name = fileName;
+    std::string new_file_name = fileName;
     size_t file_name_iter = new_file_name.find(".crypted");
+
     if (file_name_iter == std::string::npos)
         new_file_name += ".crypted";
     else
         new_file_name.replace(file_name_iter, 8, "");
 
-    unsigned int blocks = 0;
-    long int file_size = GetFileSize(fileName); /* ZFS */
-    if (file_size < 0)
-    {
-        std::cerr << "[*] unable to get \"" << fileName << "\" file size. Omiting." << std::endl;
-        return -1;
-    }
-
-    /* definimos los bloques */
-    while (true)
-    {
-        long int start = (BLOCK_SIZE * blocks);
-        long int end   = start + BLOCK_SIZE;
-        
-        if (end > file_size)
-            end = file_size;
-
-        block_chunks.push_back(block_chunk{start, end});
-        blocks++;
-        
-        if (start > file_size)
-            break;
-    }
+    int ret = 0;
 
     std::ifstream file(fileName, std::fstream::in);
-    if (file.is_open())
+    if (!file.is_open())
     {
-        std::vector<unsigned char> file_data;
-
-        std::ofstream encoded_file(new_file_name, std::fstream::out | std::fstream::app);
-        if (!encoded_file.is_open())
-        {
-            std::cerr << "[*] Unable to create the " << new_file_name << " file for writing. Omiting." << std::endl;
-            return -1;
-        }
-
-        long int data_counter = 0;
-
-        for (unsigned int i = 0; i < blocks; i++)
-        {
-            std::cout << "\r" << fileName << ": encoding Block #" << i << " of " << blocks - 1 << std::flush;
-
-            while (file >> std::noskipws >> a)
-            {
-                k = password[key_index];
-                r = a ^ k;
-
-                file_data.push_back(r);
-                data_counter++;
-
-                if ((data_counter + block_chunks[i].start) >= block_chunks[i].end)
-                {
-                    key_index = 0;
-                    for (auto _bytes : file_data)
-                        encoded_file << _bytes;
-
-                    data_counter = 0;
-                    file_data.clear();
-                    break;
-                }
-
-                if (key_index >= key_length)
-                    key_index = 0;
-                else
-                    key_index++;
-            }
-        }
-
-        std::cout << ". Done." << std::endl;
-
-        encoded_file.close();
-        file.close();
+        std::cerr << "[*] unable to open \"" << fileName << "\" file. Omiting." << std::endl;
+        return -1;
     }
     else
     {
-        std::cerr << "[*] Unable to open \"" << fileName << "\" file. Omiting." << std::endl;
-        return -1;
+        /* I don't know if this is the best way to get the size
+         * of an opened file. But certainly it's better than
+         * open the same file at time
+         */
+        std::ifstream::pos_type file_size = file.tellg();
+        file.seekg(0, std::ios::end);
+        file_size += file.tellg();
+        file.seekg(0, std::ios::beg);
+
+        if (file_size <= 0)
+        {
+            std::cerr << "[*] unable to get \"" << fileName << "\" file size. Omiting." << std::endl;
+            ret = -1;
+        }
+        else
+        {
+            long int blocks = 0;
+            while (true)
+            {
+                long int start = (BLOCK_SIZE * blocks);
+                long int end   = start + BLOCK_SIZE;
+                
+                if (end > file_size)
+                    end = file_size;
+
+                block_chunks.push_back(block_chunk{start, end});
+                blocks++;
+                
+                if (start > file_size)
+                    break;
+            }
+
+            std::ofstream encoded_file(new_file_name, std::fstream::out);
+            if (!encoded_file.is_open())
+            {
+                std::cerr << "[*] unable to create \"" << new_file_name << "\" file for writing. Omiting." << std::endl;
+                ret = -1;
+            }
+            else
+            {
+                long int data_counter = 0;
+                std::vector<unsigned char> file_data;
+
+                for (unsigned int i = 0; i < blocks; i++)
+                {
+                    std::cout << "\r" << fileName << ": Encoding block " << i << " of " << blocks - 1 << std::flush;
+                    while (file >> std::noskipws >> a)
+                    {
+                        k = password[key_index];
+                        r = a ^ k;
+
+                        file_data.push_back(r);
+                        data_counter++;
+
+                        if ((data_counter + block_chunks[i].start) >= block_chunks[i].end)
+                        {
+                            key_index = data_counter = 0;
+                            for (auto& _bytes : file_data)
+                                encoded_file << _bytes;
+                            
+                            file_data.clear();
+                            break;
+                        }
+
+                        if (key_index >= key_length)
+                            key_index = 0;
+                        else
+                            key_index++;
+                    }
+                }
+
+                std::cout << ". Done." << std::endl;
+
+                encoded_file.close();
+                file.close();
+            }
+        }
     }
 
-    return 0;
-}
-
-std::ifstream::pos_type GetFileSize(std::string fileName)
-{
-    std::ifstream in(fileName, std::ifstream::ate | std::ifstream::binary);
-    std::ifstream::pos_type size = in.tellg();
-    in.close();
-
-    return size;
+    return ret;
 }
 
 Cipher::~Cipher()

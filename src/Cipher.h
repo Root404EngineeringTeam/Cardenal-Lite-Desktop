@@ -35,8 +35,8 @@ private:
 
     unsigned char r, a, k;
 
-    size_t key_length;
-    size_t key_index;
+    int key_length;
+    int key_index;
 
     std::string password;
 

@@ -1,7 +1,7 @@
 /*
  * Copyright 2017 Root404, Co
  *                Alvaro Stagg [alvarostagg@openmailbox.org]
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -44,7 +44,7 @@ int main(int argc, char* argv[])
     }
 
     int c;
-    int hflag = 0, vflag = 0;
+    int hflag = 0, vflag = 0, dflag = 0;
 
     static std::string key = "";
 
@@ -52,13 +52,14 @@ int main(int argc, char* argv[])
     {
         static struct option long_opts[] = {
             {"password", required_argument, 0, 'p'},
+            {"delete"  , required_argument, 0, 'd'},
             {"help"    , no_argument      , 0, 'h'},
             {"version" , no_argument      , 0, 'v'},
             {0, 0, 0, 0}
         };
 
         int opt_index = 0;
-        c = getopt_long(argc, argv, "p::hv", long_opts, &opt_index);
+        c = getopt_long(argc, argv, "p::dhv", long_opts, &opt_index);
         if (c == -1)
             break;
 
@@ -68,6 +69,9 @@ int main(int argc, char* argv[])
                 break;
             case 'p':
                 key = optarg;
+                break;
+            case 'd':
+                dflag = 1;
                 break;
             case 'v':
                 std::cout << argv[0] << " v" << VERSION_STR << std::endl;
@@ -94,7 +98,7 @@ int main(int argc, char* argv[])
         std::cerr << argv[0] << ": the password is empty. Exiting..." << std::endl;
         std::exit(1);
     }
-    
+
     std::vector<std::string> files = {};
     for (int i = 1; i < argc; i++)
     {
@@ -105,8 +109,18 @@ int main(int argc, char* argv[])
 
     short int ret = 0;
     Cipher crypter(key);
+
     for (auto& file : files)
+    {
         ret = crypter.Encode(file);
+        if (dflag)
+        {
+            if(std::remove(file.c_str()) != 0)
+                std::cerr << argv[0] << ": unable to delete \"" << file << "\" file." << std::endl;
+            else
+                std::cout << argv[0] << ": \"" << file << "\" old file deleted." << std::endl;
+        }
+    }
 
     return ret;
 }
@@ -118,13 +132,13 @@ static void usage(const char* argv)
 
                 "If file extension is \".crypted\" then the FILE(s) will be\n"
                 "decrypted. Otherwise, the files will be crypted.\n\n"
-                
+
                 "Mandatory arguments for long options are also mandatory\n"
                 "for short options.\n"
                 "  --password=PASSWORD set the encryption or decryption password\n"
                 "  --help              show this help and exit\n"
                 "  --version           show version and exit\n\n"
-                
+
                 "Ayude sobre errores y/o aportes en:\n"
                 "<https://github.com/Root404EngineeringTeam/Cardenal-Lite-Desktop>\n", argv);
 }

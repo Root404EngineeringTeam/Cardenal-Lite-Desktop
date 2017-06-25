@@ -1,7 +1,7 @@
 /*
  * Copyright 2017 Root404, Co
  *                Alvaro Stagg [alvarostagg@openmailbox.org]
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -81,13 +81,13 @@ int Cipher::Process(std::string fileName)
             {
                 long int start = (BLOCK_SIZE * blocks);
                 long int end   = start + BLOCK_SIZE;
-                
+
                 if (end > file_size)
                     end = file_size;
 
                 block_chunks.push_back(block_chunk{start, end});
                 blocks++;
-                
+
                 if (start > file_size)
                     break;
             }
@@ -119,7 +119,7 @@ int Cipher::Process(std::string fileName)
                             key_index = data_counter = 0;
                             for (auto& _bytes : file_data)
                                 encoded_file << _bytes;
-                            
+
                             file_data.clear();
                             break;
                         }

@@ -43,7 +43,7 @@ Cipher::Cipher(const std::string& key)
 int Cipher::Process(std::string fileName)
 {
     std::string new_file_name = fileName;
-    size_t file_name_iter = new_file_name.find(".crypted");
+    std::string::size_type file_name_iter = new_file_name.find(".crypted");
 
     if (file_name_iter == std::string::npos)
         new_file_name += ".crypted";

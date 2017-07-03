@@ -16,7 +16,7 @@ We use a simple but efficient and secure encryption algorithm based on bitwise X
 
 ### Linux / MingGW:
     # In Debian/Ubuntu based distros:
-    $ sudo apt install build-essential gcc libcrypto++8 libcrypto++8-dbg libcrypto++-dev
+    $ sudo apt install git g++ libcrypto++-dev
 
     # In Fedora/RedHat based distros:
     $ sudo dnf install git gcc-c++ cryptopp-devel

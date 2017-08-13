@@ -1,6 +1,6 @@
 /*
  * Copyright 2017 Root404, Co
- *                Alvaro Stagg [alvarostagg@openmailbox.org]
+ *                Alvaro Stagg [alvarostagg@protonmail.com]
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,8 @@
 #include <cryptopp/hex.h>
 #include <cryptopp/sha.h>
 
-Cipher::Cipher(const std::string& key)
+Cipher::Cipher(const std::string& key):
+    printOutput(true)
 {
     CryptoPP::SHA256 hash;
     unsigned char digest[CryptoPP::SHA256::DIGESTSIZE];
@@ -55,15 +56,15 @@ int Cipher::Process(std::string fileName)
     std::ifstream file(fileName, std::fstream::in);
     if (!file.is_open())
     {
-        std::cerr << "[*] unable to open \"" << fileName << "\" file. Omiting." << std::endl;
+        if (printOutput)
+            std::cerr << "[*] unable to open \"" << fileName << "\" file. Omiting." << std::endl;
         return -1;
     }
     else
     {
-        /* I don't know if this is the best way to get the size
-         * of an opened file. But certainly it's better than
-         * open the same file twice at time.
-         */
+        // I don't know if this is the best way to get the size
+        // of an opened file. But certainly it's better than
+        // open the same file twice at time.
         std::ifstream::pos_type file_size = file.tellg();
         file.seekg(0, std::ios::end);
         file_size += file.tellg();
@@ -71,7 +72,8 @@ int Cipher::Process(std::string fileName)
 
         if (file_size <= 0)
         {
-            std::cerr << "[*] unable to get \"" << fileName << "\" file size. Omiting." << std::endl;
+            if (printOutput)
+                std::cerr << "[*] unable to get \"" << fileName << "\" file size. Omiting." << std::endl;
             ret = -1;
         }
         else
@@ -95,7 +97,8 @@ int Cipher::Process(std::string fileName)
             std::ofstream encoded_file(new_file_name, std::fstream::out);
             if (!encoded_file.is_open())
             {
-                std::cerr << "[*] unable to create \"" << new_file_name << "\" file for writing. Omiting." << std::endl;
+                if (printOutput)
+                    std::cerr << "[*] unable to create \"" << new_file_name << "\" file for writing. Omiting." << std::endl;
                 ret = -1;
             }
             else
@@ -105,7 +108,8 @@ int Cipher::Process(std::string fileName)
 
                 for (unsigned int i = 0; i < blocks; i++)
                 {
-                    std::cout << "\r" << fileName << ": Encoding block " << i << " of " << blocks - 1 << std::flush;
+                    if (printOutput)
+                        std::cout << "\r" << fileName << ": Encoding block " << i << " of " << blocks - 1 << std::flush;
                     while (file >> std::noskipws >> a)
                     {
                         k = password[key_index];
@@ -131,7 +135,8 @@ int Cipher::Process(std::string fileName)
                     }
                 }
 
-                std::cout << ". Done." << std::endl;
+                if (printOutput)
+                    std::cout << ". Done." << std::endl;
 
                 encoded_file.close();
                 file.close();
@@ -144,6 +149,6 @@ int Cipher::Process(std::string fileName)
 
 Cipher::~Cipher()
 {
-    if (block_chunks.size() != 0)
+    if (!block_chunks.empty())
         block_chunks.clear();
 }

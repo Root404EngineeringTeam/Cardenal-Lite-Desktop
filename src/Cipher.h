@@ -1,6 +1,6 @@
 /*
  * Copyright 2017 Root404, Co
- *                Alvaro Stagg [alvarostagg@openmailbox.org]
+ *                Alvaro Stagg [alvarostagg@protonmail.com]
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 #include <string>
 #include <vector>
 
+// Block size is 10MB
 #define BLOCK_SIZE 10485760
 
 class Cipher
@@ -29,9 +30,11 @@ public:
     Cipher(const std::string& key);
     virtual ~Cipher();
 
+    inline void ShowOutput(bool show) { printOutput = show; }
     inline int Encode(std::string fileName) { return Process(fileName); }
 private:
     int Process(std::string fileName);
+    bool printOutput;
 
     unsigned char r, a, k;
 

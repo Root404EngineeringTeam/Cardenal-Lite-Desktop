@@ -29,7 +29,7 @@ Then you can build a console application using:
 
     $ make console
 
-This should create an executable called **_cardinal_** within the **bin** directory that is inside the **cli** directory.
+This should create an executable called **_cardenal_** within the **bin** directory that is inside the **cli** directory.
 You can run it with:
 
     $ ./cardenal --help
@@ -38,7 +38,7 @@ Otherwise, if you wan't a GUI application you can build it with:
 
     $ make gui
 
-Then you can execute the binary called **_cardinal_** generated inside the **bin**
+Then you can execute the binary called **_cardenal_** generated inside the **bin**
 directory that is inside the **gui** directory with two clicks or through the console with:
 
     $ ./cardenal
